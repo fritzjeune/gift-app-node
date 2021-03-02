@@ -6,12 +6,20 @@ const PostSchema = new mongoose.Schema({
         maxlength: 250,
 
     },
-    post_owner: String, //for now , later will cast to an objectId of a user. it's publisher.
+    post_picture: String,
+    post_owner: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'UserAccount',
+        required: false //for now 
+    }, 
     like_count: Number,
-    users_targert: String, // later will be a list of user who will have access to the post.
+    users_target: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'UserAccount'
+    }], // later will be a list of user who will have access to the post.
     shared_count: Number,
     hash_tags_category: [{
-        
+        type: String
     }]
 
 })
