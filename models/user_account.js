@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
 
 const UserAccountSchema = new mongoose.Schema({
     firstname : {
@@ -86,12 +87,10 @@ UserAccountSchema.pre('save', function(next) {
 
     if (user.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
-            console.log(salt);
             if (err) return next(err);
 
             bcrypt.hash(user.password, salt, (err, hash) => {
                 if (err) return next(err);
-                console.log(hash);
                 user.password = hash;
                 next();
             });
