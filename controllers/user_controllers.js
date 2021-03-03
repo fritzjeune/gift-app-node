@@ -28,7 +28,17 @@ exports.signUpUser = async (req, res , next) => {
 
 exports.loginUser = async (req, res, next) => {
     try {
-        const user = await UserAccount.findOne({username: req.body.username});
+        const re = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+
+        var query;
+
+        if (re.test(req.body.username)) {
+            query = {email: req.body.username}
+        } else {
+            query = {username: req.body.username}
+        }
+
+        const user = await UserAccount.findOne(query);
 
         // compare given password with the encrypted password
         if (!user) {
