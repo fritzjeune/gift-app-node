@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 
-const UserAccountSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     firstname : {
         type: String,
         required: true,
@@ -79,10 +79,19 @@ const UserAccountSchema = new mongoose.Schema({
     
 },
 {
+    toObject: {virtuals: true},
+    toJSON: {virtuals: true},
     timestamps: true
 });
 
-UserAccountSchema.pre('save', function(next) {
+UserSchema.virtual('favorite_gifts', {
+    ref: 'FavoriteGiftSchema',
+    localField: 'favorite_gift',
+    foreignField: 'owner',
+    count: false
+})
+
+UserSchema.pre('save', function(next) {
     let user = this;
 
     if (user.isModified('password')) {
@@ -101,7 +110,7 @@ UserAccountSchema.pre('save', function(next) {
 
 });
 
-UserAccountSchema.methods.generateToken = function() {
+UserSchema.methods.generateToken = function() {
     var user = this;
     var token = jwt.sign(user._id.toHexString(), 'supersecret');
 
@@ -116,4 +125,4 @@ UserAccountSchema.methods.generateToken = function() {
 
 
 
-module.exports = mongoose.models.UserAccount || mongoose.model('UserAccount', UserAccountSchema);
+module.exports = mongoose.models.UserSchema || mongoose.model('User', UserSchema);

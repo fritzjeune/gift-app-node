@@ -12,7 +12,8 @@ exports.signUpUser = async (req, res , next) => {
 
         res.status(200).json({
             success: true,
-            data: user
+            data: user,
+            token: token
         })
     } catch (error) {
         if(error) {
@@ -28,6 +29,7 @@ exports.signUpUser = async (req, res , next) => {
 
 exports.loginUser = async (req, res, next) => {
     try {
+        // verify if user is login with a username or an email
         const re = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
         var query;
@@ -69,7 +71,7 @@ exports.loginUser = async (req, res, next) => {
                     res.status(200).json({
                         succes: true,
                         message: "login successfull",
-                        data: user.tokens
+                        token: token
                     })
                 }
             })
@@ -85,25 +87,68 @@ exports.loginUser = async (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
     try {
-        const user = await UserAccount.find({username: req.params.username})
-        if (user) {
-            const userUpdated = await UserAccount.findOneAndUpdate({ username: req.params.username }, req.body, { new: true, runValidators: true });
+        const user = await UserAccount.findOne({username: req.params.username})
 
-            return res.status(201).json({
-                succes: true,
-                data: userUpdated
+        //TODO verify if the user who make the update request is the account owner
+        // using the JWT module to verify that by the token
+        
+        if (user) { 
+            const userloggedin = res.locals.user;
+            // console.log(user.id == userloggedin.id);
+            if (user.id == userloggedin.id) {
+                const userUpdated = await UserAccount.findOneAndUpdate({ username: req.params.username }, req.body, { new: true, runValidators: true });
+
+                res.status(201).json({
+                    succes: true,
+                    data: userUpdated
+                })
+            } else {
+                return res.status(405).json({
+                    succes: false,
+                    message: "you are not authorized to perfome this updates"
+                })
+            }
+            
+        }
+
+        res.status(403).json({
+            succes: false,
+            data: "can't find that user in our database"
+        })
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//retrieve a user profile       **login require
+//@/apiv1/user/:username
+//Method: GET request
+exports.getUser = async (req, res, next) => {
+    try {
+        const userloggedin = res.locals.user;
+        console.log(req.params)
+        const user = await UserAccount.findOne(req.params)
+
+        console.log(user)
+        if (!user) {
+            return res.status(404).json({
+                succes: false,
+                message: "can't find that user."
             })
         }
 
         res.status(201).json({
             succes: true,
-            data: userUpdated
+            message: "successfully get the user Profile",
+            data: user
         })
+
+
     } catch (error) {
-        console.log(error)
+        res.status(403).json({
+            succes: false,
+            message: "cannot get the user info, please loggin first."
+        })
     }
-
-
-
 }
-
