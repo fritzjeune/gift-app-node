@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const CommentSchema = new mongoose.Schema({
     referredTo: {
         type: mongoose.Schema.ObjectId,
-        ref: 'Post',
+        ref: 'Post', // we can use a conditionl to verify if it s a post or another comment.
         required: false//for now // this is the field that will contain info about the items that we are commenting to
     },
     commentText: {
