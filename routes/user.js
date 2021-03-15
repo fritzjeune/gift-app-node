@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const userAuth = require("../middlewares/auth");
 
-const { signUpUser, updateUser, loginUser, getUser } = require("../controllers/user_controllers");
-const { addGift } = require("../controllers/gift_controller");
+const { signUpUser, updateUser, loginUser, getUser } = require("../controllers/users");
+const { addGift } = require("../controllers/gifts");
+const { addPost } = require("../controllers/posts")
 
 router
     .route('/signup')
@@ -18,6 +19,10 @@ router
 router
     .route('/login')
     .post(loginUser);
+
+router
+    .route('/:username/posts')
+    .post(userAuth, addPost)
 
 router
     .route('/:username/gifts')

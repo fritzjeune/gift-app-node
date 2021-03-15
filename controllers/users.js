@@ -1,4 +1,4 @@
-const User = require("../models/user_account");
+const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
 //create a user       **no login require

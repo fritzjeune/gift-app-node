@@ -1,7 +1,7 @@
 const express = require("express");
 const connectDB = require('./config/db');
 const dotenv = require("dotenv");
-const userRouter = require("./routes/user_route");
+const userRouter = require("./routes/user");
 // const auth = require("./middlewares/auth");
 
 //load env files 
