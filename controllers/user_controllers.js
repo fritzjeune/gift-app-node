@@ -1,4 +1,4 @@
-const UserAccount = require("../models/user_account");
+const User = require("../models/user_account");
 const bcrypt = require("bcrypt");
 
 //create a user       **no login require
@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 //Method: GET request
 exports.signUpUser = async (req, res , next) => {
     try {
-        const user = await UserAccount.create(req.body);
+        const user = await User.create(req.body);
         const token = user.generateToken();
         // console.log(token);
 
@@ -40,7 +40,7 @@ exports.loginUser = async (req, res, next) => {
             query = {username: req.body.username}
         }
 
-        const user = await UserAccount.findOne(query);
+        const user = await User.findOne(query);
 
         // compare given password with the encrypted password
         if (!user) {
@@ -87,7 +87,7 @@ exports.loginUser = async (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
     try {
-        const user = await UserAccount.findOne({username: req.params.username})
+        const user = await User.findOne({username: req.params.username})
 
         //TODO verify if the user who make the update request is the account owner
         // using the JWT module to verify that by the token
@@ -96,7 +96,7 @@ exports.updateUser = async (req, res, next) => {
             const userloggedin = res.locals.user;
             // console.log(user.id == userloggedin.id);
             if (user.id == userloggedin.id) {
-                const userUpdated = await UserAccount.findOneAndUpdate({ username: req.params.username }, req.body, { new: true, runValidators: true });
+                const userUpdated = await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true, runValidators: true });
 
                 res.status(201).json({
                     succes: true,
@@ -128,7 +128,7 @@ exports.getUser = async (req, res, next) => {
     try {
         const userloggedin = res.locals.user;
         console.log(req.params)
-        const user = await UserAccount.findOne(req.params)
+        const user = await User.findOne(req.params)
 
         console.log(user)
         if (!user) {
