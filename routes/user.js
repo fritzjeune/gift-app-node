@@ -4,12 +4,16 @@ const userAuth = require("../middlewares/auth");
 
 const { signUpUser, updateUser, loginUser, getUser } = require("../controllers/users");
 const { addGift } = require("../controllers/gifts");
-const { addPost } = require("../controllers/posts")
+const { addPost, getPosts } = require("../controllers/posts")
 
 router
     .route('/signup')
     .post(signUpUser);
-    // .get(getUser);
+
+router
+    .route('/:username/posts')
+    .post(userAuth, addPost)
+    .get(userAuth, getPosts);
     
 router
     .route('/profile/:username')
@@ -19,10 +23,6 @@ router
 router
     .route('/login')
     .post(loginUser);
-
-router
-    .route('/:username/posts')
-    .post(userAuth, addPost)
 
 router
     .route('/:username/gifts')

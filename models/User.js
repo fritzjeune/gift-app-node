@@ -57,19 +57,22 @@ const UserSchema = new mongoose.Schema({
     }, 
     followers: [{
         type:mongoose.Schema.ObjectId,
-        ref: 'UserAccount'
+        ref: 'User'
     }],
     followings: [{
         type:mongoose.Schema.ObjectId,
-        ref: 'UserAccount'
+        ref: 'User'
     }],
     followers_count: Number,
     following_count: Number,
-    posts: [],
-    favorite_gift: [{
+    posts: [{
         type: mongoose.Schema.ObjectId,
-        ref: 'favorite_gift'
+        ref: 'Post'
     }],
+    //     gifts: [{
+    //     type: mongoose.Schema.ObjectId,
+    //     ref: 'Gift'
+    // }],
     tokens: [{
         token: {
             type: String,
@@ -84,9 +87,9 @@ const UserSchema = new mongoose.Schema({
     timestamps: true
 });
 
-UserSchema.virtual('favorite_gifts', {
-    ref: 'FavoriteGiftSchema',
-    localField: 'favorite_gift',
+UserSchema.virtual('gifts', {
+    ref: 'Gift',
+    localField: 'gift',
     foreignField: 'owner',
     count: false
 })

@@ -127,10 +127,10 @@ exports.updateUser = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
     try {
         const userloggedin = res.locals.user;
-        console.log(req.params)
-        const user = await User.findOne(req.params)
+        // console.log(req.params)
+        const user = await User.findOne(req.params).populate({ path: 'posts', select: 'postDescription postURL' })
 
-        console.log(user)
+        // console.log(user)
         if (!user) {
             return res.status(404).json({
                 succes: false,
