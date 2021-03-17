@@ -32,8 +32,6 @@ exports.addPost = async (req, res, next) => {
             }
         });
 
-        console.log(user.posts)
-
         res.status(200).json({
             success: true,
             message: "successfully add the post",
@@ -67,6 +65,49 @@ exports.getPosts = async (req, res, next) => {
             data: posts
         })
 
+    } catch (err) {
+        if (err) throw err;
+    }
+}
+
+
+// @desc             Updateding a user loggedin specific post 
+// @routes           PUT /apiv1/user/:username/posts/:postId
+// @Access           Private, Auth required
+
+exports.likePost = async (req, res, next) => {
+    try {
+        var post = await Post.findById(req.params.postId);
+        console.log(req.body.reaction)
+
+        if (req.body.reaction == "like") {
+            post.likes = post.likes.concat(res.locals.user.id);
+            await post.save();
+        } else if (req.body.reaction == "share") {
+            req.body.to.forEach(element => {
+                post.shares = post.shares.concat(element);
+            });
+            // post.shares = post.shares.concat(res.locals.user.id);
+            await post.save();
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: "please you must select a reaction"
+            })
+        }
+        
+
+
+        post = await Post.findById(req.params.postId)
+            .populate({ path: 'author', select: 'username' })
+            .populate({ path: 'shares', select: 'username' })
+            .populate({ path: 'likes', select: 'username' });
+
+        res.status(201).json({
+            success: true,
+            message: `successfully ${req.body.reaction} the post`,
+            data: post
+        });
     } catch (err) {
         if (err) throw err;
     }

@@ -4,7 +4,7 @@ const userAuth = require("../middlewares/auth");
 
 const { signUpUser, updateUser, loginUser, getUser } = require("../controllers/users");
 const { addGift } = require("../controllers/gifts");
-const { addPost, getPosts } = require("../controllers/posts")
+const { addPost, getPosts, likePost } = require("../controllers/posts")
 
 router
     .route('/signup')
@@ -14,6 +14,10 @@ router
     .route('/:username/posts')
     .post(userAuth, addPost)
     .get(userAuth, getPosts);
+
+router
+    .route('/:username/posts/:postId')
+    .put(userAuth, likePost);
     
 router
     .route('/profile/:username')
