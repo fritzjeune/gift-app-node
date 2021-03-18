@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require('./config/db');
 const dotenv = require("dotenv");
 const userRouter = require("./routes/user");
+const postRouter = require("./routes/post");
 // const auth = require("./middlewares/auth");
 
 //load env files 
@@ -14,7 +15,8 @@ const App = express();
 App.use(express.json());
 
 //loading routes
-App.use("/apiv1/user", userRouter)
+App.use("/apiv1/users", userRouter);
+App.use("/apiv1/posts", postRouter);
 
 
 App.listen(3000, ()=>{

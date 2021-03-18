@@ -30,7 +30,8 @@ const PostSchema = new mongoose.Schema({
     comments: {
         type: mongoose.Schema.ObjectId,
         ref: 'Comments'
-    }
+    },
+    private: Boolean
 
 },{
     timestamps: true

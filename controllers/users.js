@@ -128,7 +128,10 @@ exports.getUser = async (req, res, next) => {
     try {
         const userloggedin = res.locals.user;
         // console.log(req.params)
-        const user = await User.findOne(req.params).populate({ path: 'posts', select: 'postDescription postURL' })
+        const user = await User.findOne(req.params)
+            .populate({ path: 'posts', select: 'postDescription postURL' })
+            .populate({ path: 'followers', select: 'username firstname lastname' })
+            .populate({ path: 'followings', select: 'username firstname lastname' });
 
         // console.log(user)
         if (!user) {
@@ -151,4 +154,32 @@ exports.getUser = async (req, res, next) => {
             message: "cannot get the user info, please loggin first."
         })
     }
+}
+
+exports.followUser = async (req, res, next) => {
+    try {
+        const user = await User.findOne({username: req.params.username});
+        const loggedin = res.locals.user;
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "user not found"
+            });
+        }
+        user.followers = user.followers.concat(loggedin.id);
+        user.save();
+
+        loggedin.followings = loggedin.followings.concat(user.id);
+        loggedin.save();
+
+        res.status(201).json({
+            success: true,
+            message: `successfully follow ${user.username}`
+        })
+
+    } catch (error) {
+        if (error) throw error;
+    }
+
+    
 }
