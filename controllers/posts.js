@@ -87,8 +87,6 @@ exports.getPosts = async (req, res, next) => {
     }
 }
 
-//TODO give more privacity to the post , when fethching
-
 
 // @desc             get a specific post 
 // @routes           GET /apiv1/posts/:postId

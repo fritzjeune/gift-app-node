@@ -4,7 +4,6 @@ const userAuth = require("../middlewares/auth");
 
 const { signUpUser, updateUser, loginUser, getUser, followUser } = require("../controllers/users");
 const { addGift } = require("../controllers/gifts");
-const { addPost, getPosts, likePost } = require("../controllers/posts")
 
 router
     .route('/signup')
