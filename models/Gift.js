@@ -31,9 +31,12 @@ const GiftSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
     }],
-    comments: {
+    comments: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Comment'
+    }],
+    status: {
+        type: String
     }
 }, {
     toJSON: {virtuals: true},
