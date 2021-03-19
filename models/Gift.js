@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const GiftSchema = new mongoose.Schema({
-    name : {
+    name: {
         type: String,
         required: true
     },
@@ -27,10 +27,10 @@ const GiftSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
     }], 
-    shares: {
+    shares: [{
         type: mongoose.Schema.ObjectId,
         ref: 'User'
-    },
+    }],
     comments: {
         type: mongoose.Schema.ObjectId,
         ref: 'Comment'

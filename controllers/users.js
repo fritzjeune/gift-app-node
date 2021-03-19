@@ -130,6 +130,7 @@ exports.getUser = async (req, res, next) => {
         // console.log(req.params)
         const user = await User.findOne(req.params)
             .populate({ path: 'posts', select: 'postDescription postURL' })
+            .populate('gifts')
             .populate({ path: 'followers', select: 'username firstname lastname' })
             .populate({ path: 'followings', select: 'username firstname lastname' });
 

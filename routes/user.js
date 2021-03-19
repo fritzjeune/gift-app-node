@@ -3,7 +3,6 @@ const router = express.Router();
 const userAuth = require("../middlewares/auth");
 
 const { signUpUser, updateUser, loginUser, getUser, followUser } = require("../controllers/users");
-const { addGift } = require("../controllers/gifts");
 
 router
     .route('/signup')
@@ -18,10 +17,6 @@ router
 router
     .route('/login')
     .post(loginUser);
-
-router
-    .route('/:username/gifts')
-    .post(userAuth, addGift);
 
 
 

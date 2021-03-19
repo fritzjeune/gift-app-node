@@ -3,6 +3,7 @@ const connectDB = require('./config/db');
 const dotenv = require("dotenv");
 const userRouter = require("./routes/user");
 const postRouter = require("./routes/post");
+const giftRouter = require("./routes/gift");
 // const auth = require("./middlewares/auth");
 
 //load env files 
@@ -17,7 +18,7 @@ App.use(express.json());
 //loading routes
 App.use("/apiv1/users", userRouter);
 App.use("/apiv1/posts", postRouter);
-
+App.use("/apiv1/gifts", giftRouter);
 
 App.listen(3000, ()=>{
     console.log("App running on port 3000")

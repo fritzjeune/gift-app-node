@@ -69,10 +69,10 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Post'
     }],
-    //     gifts: [{
-    //     type: mongoose.Schema.ObjectId,
-    //     ref: 'Gift'
-    // }],
+    gifts: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Gift'
+    }],
     tokens: [{
         token: {
             type: String,
@@ -86,13 +86,6 @@ const UserSchema = new mongoose.Schema({
     toJSON: {virtuals: true},
     timestamps: true
 });
-
-UserSchema.virtual('gifts', {
-    ref: 'Gift',
-    localField: 'gift',
-    foreignField: 'owner',
-    count: false
-})
 
 UserSchema.pre('save', function(next) {
     let user = this;
