@@ -1,4 +1,3 @@
-const { replaceOne, findById } = require("../models/Post");
 const Post = require("../models/Post");
 const User = require("../models/User");
 

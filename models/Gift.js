@@ -12,7 +12,7 @@ const GiftSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ["flower", "material", "home appliance", "luxury", "money", "ropa dama"],
+        enum: ["Surprise", "Material", "Home appliance", "Luxury", "Money", "Ropa dama", "Cars", "House", "Herramientas"],
         required: true
     },
     author: {
@@ -20,7 +20,7 @@ const GiftSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    hashtags: [{
+    hashTags: [{
         type: String
     }],
     likes: [{
@@ -36,7 +36,13 @@ const GiftSchema = new mongoose.Schema({
         ref: 'Comment'
     }],
     status: {
-        type: String
+        type: String,
+        default: "desired"
+    },
+    visibleBy: {
+        type: String,
+        enum:["followers", "everybody", "me"],
+        default: "followers"
     }
 }, {
     toJSON: {virtuals: true},

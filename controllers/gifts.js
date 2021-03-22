@@ -13,6 +13,19 @@ exports.addGift = async (req, res, next) => {
         const loggedin = res.locals.user;
         req.body.author = loggedin.id;
 
+        // formart hashtgas if there is any in the update request
+        if (req.body.hashTags) {
+            const hashtags = req.body.hashTags;
+            let newHashlist = []
+            if (hashtags != []) {    
+                hashtags.forEach((tags)=>{
+                    const hashedtag = `#${tags}`;
+                    newHashlist.push(hashedtag);
+                });
+                req.body.hashTags = newHashlist;
+            }
+        } 
+
         const gift = await Gift.create(req.body);
         loggedin.gifts = loggedin.gifts.concat(gift.id);
         loggedin.save();
@@ -111,6 +124,20 @@ exports.editGift = async (req, res, next) => {
                 message: "You are not Authorized to edit that Gift"
             })
         }
+
+        // formart hashtgas if there is any in the update request
+        if (req.body.hashTags) {
+            const hashtags = req.body.hashTags;
+            let newHashlist = []
+            if (hashtags != []) {    
+                hashtags.forEach((tags)=>{
+                    const hashedtag = `#${tags}`;
+                    newHashlist.push(hashedtag);
+                });
+                req.body.hashTags = newHashlist;
+            }
+        } 
+
         //TODO: prevent user from changing the Gift Author 
         const giftUpdated = await Gift.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
