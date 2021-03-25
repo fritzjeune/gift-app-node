@@ -102,6 +102,7 @@ exports.getPost = async (req, res, next) => {
         const post = await Post.find(req.query)
             .populate({ path: 'author', select: 'username' })
             .populate({ path: 'shares', select: 'username' })
+            .populate({ path: 'comments', select: 'commentText author comments' })
             .populate({ path: 'likes', select: 'username' });
 
         if (!post) {

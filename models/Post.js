@@ -27,10 +27,10 @@ const PostSchema = new mongoose.Schema({
     hashTags: [{
         type: String
     }],
-    comments: {
+    comments: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Comments'
-    },
+    }],
     private: Boolean
 
 },{

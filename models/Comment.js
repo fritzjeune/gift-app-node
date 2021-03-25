@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const CommentSchema = new mongoose.Schema({
     postRef: {
@@ -25,10 +25,14 @@ const CommentSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    likes: {
+    likes: [{
         type: mongoose.Schema.ObjectId,
         ref: 'User'
-    },
+    }],
+    shares: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }],
     comments: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Comment'
@@ -42,4 +46,4 @@ const CommentSchema = new mongoose.Schema({
 });
 
 
-module.exports.CommentSchema || mongoose.model('Comment', CommentSchema)
+module.exports = mongoose.models.CommentSchema || mongoose.model('Comment', CommentSchema)
