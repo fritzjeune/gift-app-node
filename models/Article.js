@@ -39,4 +39,4 @@ const ArticleSchema = new mongoose.Schema({
 });
 
 
-module.exports.ArticleSchema || mongoose.model('Comment', CommentSchema);
+module.exports.ArticleSchema || mongoose.model('Article', CommentSchema);

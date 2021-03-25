@@ -1,9 +1,19 @@
 const mongoose = require('mongoose');
 
 const CommentSchema = new mongoose.Schema({
-    referredTo: {
+    postRef: {
         type: mongoose.Schema.ObjectId,
         ref: 'Post', // we can use a conditionl to verify if it s a post or another comment.
+        required: false//for now // this is the field that will contain info about the items that we are commenting to
+    },
+    CommentRef: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Comment', // we can use a conditionl to verify if it s a post or another comment.
+        required: false//for now // this is the field that will contain info about the items that we are commenting to
+    },
+    ArticleRef: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Article', // we can use a conditionl to verify if it s a post or another comment.
         required: false//for now // this is the field that will contain info about the items that we are commenting to
     },
     commentText: {
@@ -22,7 +32,11 @@ const CommentSchema = new mongoose.Schema({
     comments: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Comment'
-    }]
+    }],
+    private: {
+        type : Boolean,
+        default : false
+    }
 }, {
     timestamps: true
 });
