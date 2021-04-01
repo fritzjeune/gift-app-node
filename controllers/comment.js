@@ -25,12 +25,10 @@ exports.addComment = async (req, res, next) => {
             });
         } else {
             const comment = await Comment.create(req.body);
-            console.log(post)
 
             post.comments = post.comments.concat(comment._id);
             post.save();
         }
-        console.log(Comment);
 
         res.status(201).json({
             success: true,
@@ -44,3 +42,47 @@ exports.addComment = async (req, res, next) => {
         });
     }
 } 
+
+// @desc             React to a comment
+// @routes           PATCH /apiv1/posts/:postId/comment/:commentId
+// @routes           PATCH /apiv1/posts/:postId/comment/:commentId
+// @Access           Private, Auth required
+
+exports.reactToComment = async (req, res, next) => {
+    try {
+        console.log(req.body, req.params);
+        // user must not edit the referenced post neigther the comment author
+        const comment = await Comment.findById(req.params.commentId);
+
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment does not exist, or has been removed"
+            });
+        }
+        if (req.body.reaction == "like") {
+            comment.likes = comment.likes.concat(res.locals.user.id);
+            await comment.save();
+        } else if (req.body.reaction == "share") {
+            req.body.shares.forEach(element => {
+                comment.shares = comment.shares.concat(element);
+            });
+            await comment.save();
+        }
+
+        res.status(201).json({
+            success: true,
+            message: "successfully react to the comment",
+            data: comment
+                .populate({ path: 'author', select: 'username' })
+                .populate({ path: 'shares', select: 'username' })
+                .populate({ path: 'comments', select: 'commentText author comments' })
+                .populate({ path: 'likes', select: 'username' })
+        })
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+}

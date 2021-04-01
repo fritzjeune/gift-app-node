@@ -1,7 +1,7 @@
 const express = require('express');
 const userAuth = require('../middlewares/auth');
 const { getPost, getPosts, addPost, reactToPost, editPost, deletePost } = require('../controllers/posts');
-const { addComment } = require('../controllers/comment');
+const { addComment, reactToComment } = require('../controllers/comment');
 
 const router = express.Router();
 
@@ -21,7 +21,11 @@ router
     .delete(userAuth, deletePost);
 
 router
-    .route('/:postId/comment')
-    .post(userAuth, addComment)
+    .route('/:postId/comments')
+    .post(userAuth, addComment);
+
+router
+    .route('/:postId/comments/:commentId')
+    .patch(userAuth, reactToComment)
 
 module.exports = router;

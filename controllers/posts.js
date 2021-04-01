@@ -65,7 +65,11 @@ exports.getPosts = async (req, res, next) => {
         } else {
             req.query = {author: loggedin.id, private: false}
         }
-        const posts = await Post.find(req.query).populate({ path: 'author', select: 'username' });
+        const posts = await Post.find(req.query)
+            .populate({ path: 'author', select: 'username' })
+            .populate({ path: 'shares', select: 'username' })
+            .populate({ path: 'likes', select: 'username' })
+            .populate({ path: 'comments', select: 'commentText author comments' });
 
         if (!posts) {
             return res.status(403).json({
@@ -106,7 +110,7 @@ exports.getPost = async (req, res, next) => {
             .populate({ path: 'likes', select: 'username' });
 
         if (!post) {
-            return res.status(404).json({
+            return res.status(404).json({ 
                 success: false,
                 message: "unable to retrieve that post"
             })
@@ -154,6 +158,7 @@ exports.reactToPost = async (req, res, next) => {
         post = await Post.findById(req.params.postId)
             .populate({ path: 'author', select: 'username' })
             .populate({ path: 'shares', select: 'username' })
+            .populate({ path: 'comments', select: 'commentText author comments' })
             .populate({ path: 'likes', select: 'username' });
 
         res.status(201).json({
@@ -203,6 +208,7 @@ exports.editPost = async (req, res, next) => {
         post = await Post.findByIdAndUpdate(req.params.postId, req.body, { new: true, runValidators: true })
             .populate({ path: 'author', select: 'username' })
             .populate({ path: 'shares', select: 'username' })
+            .populate({ path: 'comments', select: 'commentText author comments' })
             .populate({ path: 'likes', select: 'username' });
 
         res.status(202).json({
