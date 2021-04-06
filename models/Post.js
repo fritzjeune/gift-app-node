@@ -19,7 +19,7 @@ const PostSchema = new mongoose.Schema({
     tags: [{
         type: mongoose.Schema.ObjectId,
         ref: 'User'
-    }], // later will be a list of user who will have access to the post.
+    }], // list of friends account in witch post will appear 
     shares: [{
         type: mongoose.Schema.ObjectId,
         ref: 'User'
@@ -31,8 +31,15 @@ const PostSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Comment'
     }],
-    private: Boolean
-
+    visibleTo: {
+        type: String,
+        enum: ["noone", "friends", "friendsOfFriends", "everyone"],
+        default: "friends"
+    },
+    visiblityException: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }]
 },{
     timestamps: true
 })

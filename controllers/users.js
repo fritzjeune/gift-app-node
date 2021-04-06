@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { request } = require("express");
+const { verify } = require("jsonwebtoken");
 
 //create a user       **no login require
 //@/apiv1/user
@@ -91,8 +92,9 @@ exports.updateUser = async (req, res, next) => {
         
         const userloggedin = res.locals.user;
             // console.log(user.id == userloggedin.id);
-        if (userloggedin.id == null) {
-            const userUpdated = await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true, runValidators: true });
+        if (userloggedin.id != null) {
+            const userUpdated = await User.findOneAndUpdate({ _id: userloggedin.id}, req.body, { new: true, runValidators: true });
+            
             res.status(201).json({
                 succes: true,
                 data: userUpdated
@@ -121,8 +123,12 @@ exports.updateUser = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
     try {
         const userloggedin = res.locals.user;
-        // console.log(req.params)
-        const user = await User.findOne(req.params)
+    
+        if (req.query.username == undefined) {
+            req.query.username = userloggedin.username;
+        }
+
+        const user = await User.findOne(req.query)
             .populate('posts')
             .populate('gifts')
             .populate({ path: 'friends', select: 'username firstname lastname' })
@@ -153,44 +159,121 @@ exports.getUser = async (req, res, next) => {
 
 exports.sendFriendRequest = async (req, res, next) => {
     try {
-        const user = await User.findOne({username: req.params.username});
+        const user = await User.findById(req.params.userId);
         const loggedin = res.locals.user;
+        // verify if the user exist
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "user not found"
             });
         }
+        // verify if the loggedin user dont have a pending request
+        if (user.friendRequests.includes(loggedin.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "You already have a request pending"
+            });
+        }
+        // verify if they are not already friends
+        if (user.friends.includes(loggedin.id) && loggedin.friends.includes(user.id)) {
+            return res.status(400).json({
+                success: false,
+                message: `You and ${user.username} are Already Friends`
+            })
+        }
+
         user.friendRequests = user.friendRequests.concat(loggedin.id);
         user.save();
 
-        // loggedin.followings = loggedin.followings.concat(user.id);
-        // loggedin.save();
 
         res.status(201).json({
             success: true,
-            message: `successfully follow ${user.username}`
+            message: `successfully sent friend request to ${user.username}`
         })
 
-    } catch (error) {
-        if (error) throw error;
-    }
+    } catch (err) {
 
-    
+        if (err) {
+            res.status(400).json({
+                success: false,
+                message: err.message
+            })
+        }
+        
+    } 
 }
 
-// exports.respondFriendRequests = async (req, res, next) => {
-//     try {
-//         const user = req.params.
-//         if (req.body.response == "accepted") {
-//             console.log("accepted")
-//         }
-//     } catch (err) {
-//         if (err) {
-//             res.status(400).json({
-//                 success: false,
-//                 message: err.message
-//             })
-//         }
-//     }
-// }
+exports.respondFriendRequest = async (req, res, next) => {
+    try {
+        const loggedin = res.locals.user;
+
+        const user = await User.findById(req.params.userId);
+
+        // verify if the user sent in params really exist
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: `user with the Id:${req.params.userId} cannot be Found`
+            })
+        }
+        // verify if the user exist in the loggedin user friendRequest
+        if (!loggedin.friendRequests.includes(req.params.userId)) {
+            return res.status(401).json({
+                success: false,
+                message: "please use a valid Friend request"
+            })
+        }
+        // verify what action the user want to perfom with the friend request
+        if (req.body.response == "accepted") {
+            if (!loggedin.friends.includes(user.id)) {
+                loggedin.friends = loggedin.friends.concat(user.id);
+                await loggedin.save();
+            }
+            
+            if (!user.friends.includes(loggedin.id)) {
+                user.friends = user.friends.concat(loggedin.id)
+                await user.save();
+            }
+            // removing the user from the friend request list after establishing relationship
+            for (var i = 0; i < loggedin.friendRequests.length; i++) {
+                if (loggedin.friendRequests[i] == user.id) {
+                    loggedin.friendRequests.splice(i, 1);
+                    i--;
+                    await loggedin.save()
+                }
+            }
+
+            return res.status(201).json({
+                success: true,
+                message: `You and ${user.username} are Now Friends`,
+                data: loggedin
+            })
+        } else if (req.body.response == "deleted") {
+            for (var i = 0; i < loggedin.friendRequests.length; i++) {
+                if (loggedin.friendRequests[i] == user.id) {
+                    loggedin.friendRequests.splice(i, 1);
+                    i--;
+                    await loggedin.save()
+                }
+
+                return res.status(200).json({
+                    success: true,
+                    message: `Successfully deleted ${user.username} from the list`
+                })
+            }
+        } else {
+            res.status(400).json({
+                success: false,
+                message: "Please Provide and action to perfom"
+            })
+        }
+    } catch (err) {
+        if (err) {
+            res.status(400).json({
+                success: false,
+                message: err.message
+            })
+        }
+    }
+}
