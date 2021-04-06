@@ -55,16 +55,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false  // for now
     }, 
-    followers: [{
+    friends: [{
         type:mongoose.Schema.ObjectId,
         ref: 'User'
     }],
-    followings: [{
+    friendRequests: [{
         type:mongoose.Schema.ObjectId,
         ref: 'User'
     }],
-    followers_count: Number,
-    following_count: Number,
     posts: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Post'

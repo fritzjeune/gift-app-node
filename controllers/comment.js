@@ -74,10 +74,6 @@ exports.reactToComment = async (req, res, next) => {
             success: true,
             message: "successfully react to the comment",
             data: comment
-                .populate({ path: 'author', select: 'username' })
-                .populate({ path: 'shares', select: 'username' })
-                .populate({ path: 'comments', select: 'commentText author comments' })
-                .populate({ path: 'likes', select: 'username' })
         })
     } catch (err) {
         res.status(400).json({
@@ -85,4 +81,13 @@ exports.reactToComment = async (req, res, next) => {
             message: err.message
         });
     }
+}
+
+// @desc             Get a post Comments
+// @routes           PATCH /apiv1/posts/:postId/comment/
+// @routes           PATCH /apiv1/posts/:postId/comment/
+// @Access           Private, Auth required
+
+exports.getComments = async (req, res, next) => {
+    
 }

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userAuth = require("../middlewares/auth");
 
-const { signUpUser, updateUser, loginUser, getUser, followUser } = require("../controllers/users");
+const { signUpUser, updateUser, loginUser, getUser, sendFriendRequest } = require("../controllers/users");
 
 router
     .route('/signup')
@@ -10,9 +10,12 @@ router
     
 router
     .route('/profile/:username')
-    .put(userAuth, updateUser)
     .get(userAuth, getUser)
-    .post(userAuth, followUser);
+    .post(userAuth, sendFriendRequest);
+
+router
+    .route('/profile')
+    .put(userAuth, updateUser)
 
 router
     .route('/login')

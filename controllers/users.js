@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const { request } = require("express");
 
 //create a user       **no login require
 //@/apiv1/user
@@ -87,28 +88,20 @@ exports.loginUser = async (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
     try {
-        const user = await User.findOne({username: req.params.username})
-
-        //TODO verify if the user who make the update request is the account owner
-        // using the JWT module to verify that by the token
         
-        if (user) { 
-            const userloggedin = res.locals.user;
+        const userloggedin = res.locals.user;
             // console.log(user.id == userloggedin.id);
-            if (user.id == userloggedin.id) {
-                const userUpdated = await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true, runValidators: true });
-
-                res.status(201).json({
-                    succes: true,
-                    data: userUpdated
-                })
-            } else {
-                return res.status(405).json({
-                    succes: false,
-                    message: "you are not authorized to perfome this updates"
-                })
-            }
-            
+        if (userloggedin.id == null) {
+            const userUpdated = await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true, runValidators: true });
+            res.status(201).json({
+                succes: true,
+                data: userUpdated
+            })
+        } else {
+            return res.status(405).json({
+                succes: false,
+                message: "you are not authorized to perfome this updates"
+            })
         }
 
         res.status(403).json({
@@ -124,15 +117,16 @@ exports.updateUser = async (req, res, next) => {
 //retrieve a user profile       **login require
 //@/apiv1/user/:username
 //Method: GET request
+
 exports.getUser = async (req, res, next) => {
     try {
         const userloggedin = res.locals.user;
         // console.log(req.params)
         const user = await User.findOne(req.params)
-            .populate({ path: 'posts', select: 'postDescription postURL' })
+            .populate('posts')
             .populate('gifts')
-            .populate({ path: 'followers', select: 'username firstname lastname' })
-            .populate({ path: 'followings', select: 'username firstname lastname' });
+            .populate({ path: 'friends', select: 'username firstname lastname' })
+            .populate({ path: 'friendRequests', select: 'username firstname lastname' });
 
         // console.log(user)
         if (!user) {
@@ -157,7 +151,7 @@ exports.getUser = async (req, res, next) => {
     }
 }
 
-exports.followUser = async (req, res, next) => {
+exports.sendFriendRequest = async (req, res, next) => {
     try {
         const user = await User.findOne({username: req.params.username});
         const loggedin = res.locals.user;
@@ -167,11 +161,11 @@ exports.followUser = async (req, res, next) => {
                 message: "user not found"
             });
         }
-        user.followers = user.followers.concat(loggedin.id);
+        user.friendRequests = user.friendRequests.concat(loggedin.id);
         user.save();
 
-        loggedin.followings = loggedin.followings.concat(user.id);
-        loggedin.save();
+        // loggedin.followings = loggedin.followings.concat(user.id);
+        // loggedin.save();
 
         res.status(201).json({
             success: true,
@@ -184,3 +178,19 @@ exports.followUser = async (req, res, next) => {
 
     
 }
+
+// exports.respondFriendRequests = async (req, res, next) => {
+//     try {
+//         const user = req.params.
+//         if (req.body.response == "accepted") {
+//             console.log("accepted")
+//         }
+//     } catch (err) {
+//         if (err) {
+//             res.status(400).json({
+//                 success: false,
+//                 message: err.message
+//             })
+//         }
+//     }
+// }
