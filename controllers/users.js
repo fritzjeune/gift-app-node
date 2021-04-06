@@ -1,11 +1,13 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const { request } = require("express");
+// const { request } = require("express");
 const { verify } = require("jsonwebtoken");
 
-//create a user       **no login require
-//@/apiv1/user
-//Method: GET request
+
+// @desc             Add a new user Profile
+// @routes           POST /apiv1/users/profile
+// @Access           Public, Auth not required
+// @Condition        User must provide all required info.
 exports.signUpUser = async (req, res , next) => {
     try {
         const user = await User.create(req.body);
@@ -29,6 +31,10 @@ exports.signUpUser = async (req, res , next) => {
 
 }
 
+// @desc             login user
+// @routes           POST /apiv1/users/login
+// @Access           Public, Auth not required
+// @Condition        User must provide all required credentials
 exports.loginUser = async (req, res, next) => {
     try {
         // verify if user is login with a username or an email
@@ -87,6 +93,10 @@ exports.loginUser = async (req, res, next) => {
     }
 }
 
+// @desc             Update user Profile info
+// @routes           PUT /apiv1/users/profile
+// @Access           Private, Auth required
+// @Condition        User can only update his own account info
 exports.updateUser = async (req, res, next) => {
     try {
         
@@ -116,10 +126,11 @@ exports.updateUser = async (req, res, next) => {
     }
 }
 
-//retrieve a user profile       **login require
-//@/apiv1/user/:username
-//Method: GET request
-
+// @desc             get a user Profile info
+// @routes           GET /apiv1/users/profile
+// @Access           Private, Auth required
+// @Condition        User can get his own profile or query for a foreign Profile
+// @TODO             implementing the Bloked user restriction later 
 exports.getUser = async (req, res, next) => {
     try {
         const userloggedin = res.locals.user;
@@ -157,6 +168,10 @@ exports.getUser = async (req, res, next) => {
     }
 }
 
+// @desc             Send a Friend request
+// @routes           POST /apiv1/users/profile/userId
+// @Access           Private, Auth required
+// @Condition        User can send friend request to anybody , except to people with block restriction active
 exports.sendFriendRequest = async (req, res, next) => {
     try {
         const user = await User.findById(req.params.userId);
@@ -184,7 +199,7 @@ exports.sendFriendRequest = async (req, res, next) => {
         }
 
         user.friendRequests = user.friendRequests.concat(loggedin.id);
-        user.save();
+        await user.save();
 
 
         res.status(201).json({
@@ -204,6 +219,10 @@ exports.sendFriendRequest = async (req, res, next) => {
     } 
 }
 
+// @desc             Respond to Friend request
+// @routes           PUT /apiv1/users/profile/userId
+// @Access           Private, Auth required
+// @Condition        User can accept or delete a friend request
 exports.respondFriendRequest = async (req, res, next) => {
     try {
         const loggedin = res.locals.user;
